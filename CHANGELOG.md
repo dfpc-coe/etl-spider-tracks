@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.0.3
+
+- :bug: Fix Build
+
 ### v1.0.2
 
 - :bug: Fix Lints

@@ -29,9 +29,10 @@ export default class Task extends ETL {
         const res = await fetch('https://apigw.spidertracks.io/go/aff/feed', {
             method: 'POST',
             headers: {
-                Authorization: `Basic ${btoa(env.Username + ':' + env.Password)}`
+                Authorization: `Basic ${btoa(env.Username + ':' + env.Password)}`,
+                'Content-Type': 'application/json'
             },
-            body: {
+            body: JSON.stringify({
                 type: 'dataRequest',
                 dataCenter: [{
                     affVer: "json 1.0",
@@ -44,7 +45,7 @@ export default class Task extends ETL {
                     msgType: 'dataRequest',
                     dataCtrlTime: new Date().toISOString()
                 }]
-            }
+            })
         })
 
         if (!res.ok) throw new Error(await res.text());
@@ -53,11 +54,6 @@ export default class Task extends ETL {
         const fc: FeatureCollection = {
             type: 'FeatureCollection',
             features: []
-        }
-
-        for (const res of await Promise.all(obtains)) {
-            if (!res || !res.length) continue;
-            fc.features.push(...res);
         }
 
         await this.submit(fc);
