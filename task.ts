@@ -1,9 +1,8 @@
 import { Type, TSchema } from '@sinclair/typebox';
-import { FeatureCollection, Feature } from 'geojson';
+import { FeatureCollection } from 'geojson';
 import type { Event } from '@tak-ps/etl';
 import ETL, { SchemaType, handler as internal, local, env } from '@tak-ps/etl';
 import { fetch } from '@tak-ps/etl';
-import { coordEach } from '@turf/meta';
 
 const Env = Type.Object({
     'Username': Type.String(),
@@ -50,8 +49,6 @@ export default class Task extends ETL {
 
         if (!res.ok) throw new Error(await res.text());
 
-
-        console.error(res.
 
         const fc: FeatureCollection = {
             type: 'FeatureCollection',
