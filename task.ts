@@ -39,7 +39,6 @@ export default class Task extends ETL {
                     affVer: "json 1.0",
                     name: "AFF",
                     reqTime: new Date().toISOString()
-                    //reqTime: moment().subtract(1, 'hour').toISOString()
                 }],
                 msgRequest: [{
                     to: 'spidertracks',
