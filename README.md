@@ -1,6 +1,6 @@
-<h1 align='center'>ETL-CalTopo</h1>
+<h1 align='center'>ETL-SpiderTrack</h1>
 
-<p align='center'>Bring CALTopo Maps into the TAK System</p>
+<p align='center'>Bring Aircraft locations in to TAK from SpiderTracks</p>
 
 ## Development
 

@@ -1,4 +1,5 @@
 import { Type, TSchema } from '@sinclair/typebox';
+import moment from 'moment-timezone';
 import { FeatureCollection } from 'geojson';
 import type { Event } from '@tak-ps/etl';
 import ETL, { SchemaType, handler as internal, local, env } from '@tak-ps/etl';
@@ -38,18 +39,39 @@ export default class Task extends ETL {
                     affVer: "json 1.0",
                     name: "AFF",
                     reqTime: new Date().toISOString()
+                    //reqTime: moment().subtract(1, 'hour').toISOString()
                 }],
                 msgRequest: [{
                     to: 'spidertracks',
                     from: `CloudTAK-${env.Username}`,
                     msgType: 'dataRequest',
-                    dataCtrlTime: new Date().toISOString()
+                    dataCtrlTime: moment().subtract(1, 'hour').toISOString()
                 }]
             })
         })
 
         if (!res.ok) throw new Error(await res.text());
 
+        const body = await res.typed(Type.Object({
+            type: Type.Literal('FeatureCollection'),
+            dataInfo: Type.Array(Type.Object({
+                  affVer: Type.String(),
+                  provider: Type.String(),
+                  rptTime: Type.String(),
+                  reqTime: Type.String(),
+                  sysId: Type.String()
+            })),
+            features: Type.Array(Type.Object({
+                type: Type.Literal('Feature'),
+                properties: Type.Any(),
+                geometry: Type.Object({
+                    type: Type.Literal('Point'),
+                    coordinates: Type.Array(Type.Number())
+                })
+            }))
+        }))
+
+        console.error(body);
 
         const fc: FeatureCollection = {
             type: 'FeatureCollection',
