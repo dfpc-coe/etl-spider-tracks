@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.2.1
+
+- :bug: Fix build bugs
+
 ### v1.2.0
 
 - :tada: Deduplicate Features
