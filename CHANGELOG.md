@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.1.0
+
+- :tada: Expose features and metadata
+
 ### v1.0.4
 
 - :bug: Fix Key Value

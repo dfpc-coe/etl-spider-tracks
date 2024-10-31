@@ -1,6 +1,6 @@
 import { Type, TSchema } from '@sinclair/typebox';
 import moment from 'moment-timezone';
-import { FeatureCollection } from 'geojson';
+import { FeatureCollection, Feature } from 'geojson';
 import type { Event } from '@tak-ps/etl';
 import ETL, { SchemaType, handler as internal, local, env } from '@tak-ps/etl';
 import { fetch } from '@tak-ps/etl';
@@ -20,6 +20,19 @@ export default class Task extends ETL {
             return Env;
         } else {
             return Type.Object({
+                ctrId: Type.String(),
+                esn: Type.String(),
+                fix: Type.String(),
+                hdop: Type.Integer(),
+                posTime: Type.String({
+                    format: 'date-time'
+                }),
+                dataCtrTime: Type.String({
+                    format: 'date-time'
+                }),
+                src: Type.String(),
+                unitId: Type.String(),
+                trackId: Type.String()
             });
         }
     }
@@ -70,11 +83,31 @@ export default class Task extends ETL {
             }))
         }))
 
-        console.error(body);
+        
 
         const fc: FeatureCollection = {
             type: 'FeatureCollection',
-            features: []
+            features: body.features.map((feat: Feature) => {
+                return {
+                    type: 'Feature',
+                    properties: {
+                        course: feat.properties.cog,
+                        speed: feat.properties.speed,
+                        metadata: {
+                            ctrId: feat.properties.ctrId,
+                            esn: feat.properties.esn,
+                            fix: feat.properties.fix,
+                            hdop: feat.properties.hdop,
+                            posTime: feat.properties.postime,
+                            dataCtrTime: feat.properties.dataCtrTime,
+                            src: feat.properties.src,
+                            unitId: feat.properties.unitId,
+                            trackId: feat.properties.trackId
+                        }
+                    },
+                    geometry: feat.geometry
+                }
+            })
         }
 
         await this.submit(fc);
