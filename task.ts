@@ -44,7 +44,7 @@ export default class Task extends ETL {
                     to: 'spidertracks',
                     from: `CloudTAK-${env.Username}`,
                     msgType: 'dataRequest',
-                    dataCtrlTime: moment().subtract(1, 'hour').toISOString()
+                    dataCtrTime: moment().subtract(1, 'hour').toISOString()
                 }]
             })
         })

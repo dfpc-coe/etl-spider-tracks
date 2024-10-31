@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.0.4
+
+- :bug: Fix Key Value
+
 ### v1.0.3
 
 - :bug: Fix Build
