@@ -83,9 +83,9 @@ export default class Task extends ETL {
             }))
         }))
 
-        const latest: Map<string, Feature> = new Map();
+        const latest: Map<string | number, Feature> = new Map();
         body.features.forEach((feat: Feature) => {
-            const processed = {
+            const processed: Feature = {
                 id: feat.properties.unitId,
                 type: 'Feature',
                 properties: {
