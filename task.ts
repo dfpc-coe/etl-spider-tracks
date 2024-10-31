@@ -83,31 +83,40 @@ export default class Task extends ETL {
             }))
         }))
 
-        
+        const latest: Map<string, Feature> = new Map();
+        body.features.forEach((feat: Feature) => {
+            const processed = {
+                id: feat.properties.unitId,
+                type: 'Feature',
+                properties: {
+                    course: feat.properties.cog,
+                    speed: feat.properties.speed,
+                    metadata: {
+                        ctrId: feat.properties.ctrId,
+                        esn: feat.properties.esn,
+                        fix: feat.properties.fix,
+                        hdop: feat.properties.hdop,
+                        posTime: feat.properties.posTime,
+                        dataCtrTime: feat.properties.dataCtrTime,
+                        src: feat.properties.src,
+                        unitId: feat.properties.unitId,
+                        trackId: feat.properties.trackId
+                    }
+                },
+                geometry: feat.geometry
+            }
+
+            const previous = latest.get(processed.id);
+            if (!previous) {
+                latest.set(processed.id, processed);
+            } else if (new Date(previous.properties.metadata.posTime) < new Date(processed.properties.metadata.posTime)) {
+                latest.set(processed.id, processed)
+            }
+        });
 
         const fc: FeatureCollection = {
             type: 'FeatureCollection',
-            features: body.features.map((feat: Feature) => {
-                return {
-                    type: 'Feature',
-                    properties: {
-                        course: feat.properties.cog,
-                        speed: feat.properties.speed,
-                        metadata: {
-                            ctrId: feat.properties.ctrId,
-                            esn: feat.properties.esn,
-                            fix: feat.properties.fix,
-                            hdop: feat.properties.hdop,
-                            posTime: feat.properties.postime,
-                            dataCtrTime: feat.properties.dataCtrTime,
-                            src: feat.properties.src,
-                            unitId: feat.properties.unitId,
-                            trackId: feat.properties.trackId
-                        }
-                    },
-                    geometry: feat.geometry
-                }
-            })
+            features: Array.from(latest.values())
         }
 
         await this.submit(fc);

@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.2.0
+
+- :tada: Deduplicate Features
+
 ### v1.1.0
 
 - :tada: Expose features and metadata
