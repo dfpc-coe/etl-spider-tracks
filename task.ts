@@ -1,8 +1,8 @@
-import { Type, TSchema } from '@sinclair/typebox';
+import { Static, Type, TSchema } from '@sinclair/typebox';
 import moment from 'moment-timezone';
-import { FeatureCollection, Feature } from 'geojson';
 import type { Event } from '@tak-ps/etl';
-import ETL, { SchemaType, handler as internal, local, env } from '@tak-ps/etl';
+import { Feature } from 'geojson';
+import ETL, { SchemaType, handler as internal, local, InputFeatureCollection, InputFeature, DataFlowType, InvocationType } from '@tak-ps/etl';
 import { fetch } from '@tak-ps/etl';
 
 const Env = Type.Object({
@@ -15,25 +15,36 @@ const Env = Type.Object({
 });
 
 export default class Task extends ETL {
-    async schema(type: SchemaType = SchemaType.Input): Promise<TSchema> {
-        if (type === SchemaType.Input) {
-            return Env;
+    static name = 'etl-spider-tracks';
+    static flow = [ DataFlowType.Incoming ];
+    static invocation = [ InvocationType.Schedule ];
+
+    async schema(
+        type: SchemaType = SchemaType.Input,
+        flow: DataFlowType = DataFlowType.Incoming
+    ): Promise<TSchema> {
+        if (flow === DataFlowType.Incoming) {
+            if (type === SchemaType.Input) {
+                return Env;
+            } else {
+                return Type.Object({
+                    ctrId: Type.String(),
+                    esn: Type.String(),
+                    fix: Type.String(),
+                    hdop: Type.Integer(),
+                    posTime: Type.String({
+                        format: 'date-time'
+                    }),
+                    dataCtrTime: Type.String({
+                        format: 'date-time'
+                    }),
+                    src: Type.String(),
+                    unitId: Type.String(),
+                    trackId: Type.String()
+                });
+            }
         } else {
-            return Type.Object({
-                ctrId: Type.String(),
-                esn: Type.String(),
-                fix: Type.String(),
-                hdop: Type.Integer(),
-                posTime: Type.String({
-                    format: 'date-time'
-                }),
-                dataCtrTime: Type.String({
-                    format: 'date-time'
-                }),
-                src: Type.String(),
-                unitId: Type.String(),
-                trackId: Type.String()
-            });
+            return Type.Object({});
         }
     }
 
@@ -83,9 +94,9 @@ export default class Task extends ETL {
             }))
         }))
 
-        const latest: Map<string | number, Feature> = new Map();
+        const latest: Map<string | number, Static<typeof InputFeature>> = new Map();
         body.features.forEach((feat: Feature) => {
-            const processed: Feature = {
+            const processed: Static<typeof InputFeature> = {
                 id: feat.properties.unitId,
                 type: 'Feature',
                 properties: {
@@ -103,18 +114,20 @@ export default class Task extends ETL {
                         trackId: feat.properties.trackId
                     }
                 },
+                // @ts-expect-error Geometry Type
                 geometry: feat.geometry
             }
 
             const previous = latest.get(processed.id);
             if (!previous) {
                 latest.set(processed.id, processed);
+            // @ts-expect-error Untyped
             } else if (new Date(previous.properties.metadata.posTime) < new Date(processed.properties.metadata.posTime)) {
                 latest.set(processed.id, processed)
             }
         });
 
-        const fc: FeatureCollection = {
+        const fc: Static<typeof InputFeatureCollection> = {
             type: 'FeatureCollection',
             features: Array.from(latest.values())
         }
@@ -123,9 +136,8 @@ export default class Task extends ETL {
     }
 }
 
-env(import.meta.url)
-await local(new Task(), import.meta.url);
+await local(new Task(import.meta.url), import.meta.url);
 export async function handler(event: Event = {}) {
-    return await internal(new Task(), event);
+    return await internal(new Task(import.meta.url), event);
 }
 

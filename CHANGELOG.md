@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.3.0
+
+- :tada: Add Capabilities API
+
 ### v1.2.1
 
 - :bug: Fix build bugs
