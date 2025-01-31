@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.0.0
+
+- :tada: Update to `CloudTAK@v6`
+
 ### v1.3.0
 
 - :tada: Add Capabilities API
