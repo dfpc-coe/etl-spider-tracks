@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "@sinclair/typebox": "^0.34.0",
-        "@tak-ps/etl": "^8.0.2",
+        "@tak-ps/etl": "^9.0.0",
         "@turf/meta": "^7.0.0"
     }
 }
