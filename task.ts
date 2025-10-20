@@ -1,8 +1,9 @@
 import { Static, Type, TSchema } from '@sinclair/typebox';
+import { Feature } from '@tak-ps/node-cot'
 import moment from 'moment-timezone';
 import type { Event } from '@tak-ps/etl';
-import { Feature } from 'geojson';
-import ETL, { SchemaType, handler as internal, local, InputFeatureCollection, InputFeature, DataFlowType, InvocationType } from '@tak-ps/etl';
+import { Feature as GeoJSONFeature } from 'geojson';
+import ETL, { SchemaType, handler as internal, local, DataFlowType, InvocationType } from '@tak-ps/etl';
 import { fetch } from '@tak-ps/etl';
 
 const Env = Type.Object({
@@ -94,9 +95,9 @@ export default class Task extends ETL {
             }))
         }))
 
-        const latest: Map<string | number, Static<typeof InputFeature>> = new Map();
-        body.features.forEach((feat: Feature) => {
-            const processed: Static<typeof InputFeature> = {
+        const latest: Map<string | number, Static<typeof Feature.InputFeature>> = new Map();
+        body.features.forEach((feat: GeoJSONFeature) => {
+            const processed: Static<typeof Feature.InputFeature> = {
                 id: feat.properties.unitId,
                 type: 'Feature',
                 properties: {
@@ -127,7 +128,7 @@ export default class Task extends ETL {
             }
         });
 
-        const fc: Static<typeof InputFeatureCollection> = {
+        const fc: Static<typeof Feature.InputFeatureCollection> = {
             type: 'FeatureCollection',
             features: Array.from(latest.values())
         }
