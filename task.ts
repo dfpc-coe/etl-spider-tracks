@@ -97,8 +97,12 @@ export default class Task extends ETL {
 
         const latest: Map<string | number, Static<typeof Feature.InputFeature>> = new Map();
         body.features.forEach((feat: GeoJSONFeature) => {
+            if (!feat.properties) return;
+            const unitId = feat.properties.unitId;
+            if (unitId === undefined) return;
+
             const processed: Static<typeof Feature.InputFeature> = {
-                id: feat.properties.unitId,
+                id: unitId,
                 type: 'Feature',
                 properties: {
                     course: feat.properties.cog,
@@ -119,12 +123,12 @@ export default class Task extends ETL {
                 geometry: feat.geometry
             }
 
-            const previous = latest.get(processed.id);
+            const previous = latest.get(unitId);
             if (!previous) {
-                latest.set(processed.id, processed);
+                latest.set(unitId, processed);
             // @ts-expect-error Untyped
-            } else if (new Date(previous.properties.metadata.posTime) < new Date(processed.properties.metadata.posTime)) {
-                latest.set(processed.id, processed)
+            } else if (new Date(previous.properties.metadata.posTime ?? 0) < new Date(processed.properties.metadata.posTime ?? 0)) {
+                latest.set(unitId, processed)
             }
         });
 
