@@ -1,0 +1,27 @@
+{
+    "version": "1.0",
+    "name": "Spidertracks",
+    "description": "Ingests aircraft tracking positions from Spidertracks and posts them to the map.",
+    "compute": {
+        "memory": 512,
+        "timeout": 60
+    },
+    "permissions": [
+        {
+            "resource": "feature:*",
+            "required": true,
+            "description": "Spidertracks posts aircraft tracking positions to the map"
+        }
+    ],
+    "invocations": {
+        "incoming": {
+            "schedule": {
+                "description": "Polls Spidertracks for updated aircraft positions on a schedule.",
+                "default": {
+                    "enabled": true,
+                    "schedule": "rate(1 minute)"
+                }
+            }
+        }
+    }
+}
